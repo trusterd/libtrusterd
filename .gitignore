@@ -1,3 +1,7 @@
 mruby
 libtrusterd.dylib
 libtrusterd.dylib.dSYM
+node_modules
+ssl/cert.csr
+ssl/cert.pem
+ssl/key.pem

@@ -61,6 +61,7 @@ rake
 
 ```
 npm install kjunichi/node-ffi
+npm install ref
 ```
 
 ```js
