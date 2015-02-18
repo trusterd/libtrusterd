@@ -10,15 +10,26 @@ libffiを経由してhttp2サーバーを立ち上げ、http2サーバーでリ�
 
 以下の環境変数の設定とlibopensslの有効化が必要。
 
-### 環境変数の設定
+### 依存ライブラリのインストール
 
+```bash
+brew install libev
+brew install libxml2
+brew install libevent
+brew install zlib
+brew install spdylay
 ```
 
+### 環境変数の設定
+
+```bash
+export ACLOCAL_PATH=/usr/local/Cellar/libxml2/2.9.2/share/aclocal/
+export PKG_CONFIG_PATH=/usr/local/Cellar/openssl/1.0.2/lib/pkgconfig:/usr/local/Cellar/zlib/1.2.8/lib/pkgconfig/
 ```
 
 ### libopensslの有効化
 
-```
+```bash
 brew link openssl --force
 ```
 
@@ -31,12 +42,11 @@ brew unlink openssl
 ## mrubyの準備
 
 ```
-git clone
-```
-
-```
+git clone https://github.com/mruby/mruby.git
 cd mruby
-rake -f ../
+cp -f ../build_config.rb .
+rake
+cd ..
 ```
 
 ## ライブラリ本体のビルド
@@ -54,7 +64,22 @@ npm install kjunichi/node-ffi
 ```
 
 ```js
+var fs = require('fs');
+var ref = require('ref');
+var ffi = require('ffi');
 
+var funcPtr = ffi.Function('int', ['string']);
+
+var mylib = ffi.Library('./libtrusterd.dylib', {
+  'boot': ['int', ['string', funcPtr]]
+});
+
+var onResult = function(resultVal) {
+  console.log('Result is', resultVal);
+  return 0;
+}
+var script = fs.readFileSync("./trusterd.conf.rb",{encoding:"UTF-8"});
+mylib.boot(script,onResult);
 ```
 
 ### OCaml編
