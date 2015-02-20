@@ -6,6 +6,11 @@ libffiを経由してhttp2サーバーを立ち上げ、http2サーバーでリ�
 
 # 使い方
 
+```bash
+git clone https://github.com/kjunichi/libtrusterd.git
+cd libtrusterd
+```
+
 ## OSXでHomebrweを使用している場合
 
 以下の環境変数の設定とlibopensslの有効化が必要。
@@ -54,6 +59,12 @@ cd ..
 ```
 rake
 ```
+
+## SSL証明の準備
+
+なんとかして、SSLの証明書を用意するw。
+
+- http://kjunichi.cocolog-nifty.com/misc/2013/09/llhttps-0db2.html
 
 ## 動かす
 
