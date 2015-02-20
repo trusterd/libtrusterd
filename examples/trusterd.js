@@ -2,9 +2,17 @@ var fs = require('fs');
 var ref = require('ref');
 var ffi = require('ffi');
 
-var funcPtr = ffi.Function('int', ['string']);
+var LIBEXT=".so";
+if(process.platform === "darwin") {
+  LIBEXT=".dylib";
+}
+if(process.platform === "win32") {
+  LIBEXT=".dll";
+}
 
-var mylib = ffi.Library('../libtrusterd.dylib', {
+
+var funcPtr = ffi.Function('int', ['string']);
+var mylib = ffi.Library('../libtrusterd'+LIBEXT, {
   'boot': ['int', ['string', funcPtr]]
 });
 
@@ -17,3 +25,4 @@ var onResult = function(resultVal) {
 // start http2 trusterd.
 var script = fs.readFileSync("../trusterd.conf.rb",{encoding:"UTF-8"});
 mylib.boot(script,onResult);
+//
