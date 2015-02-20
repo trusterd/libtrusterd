@@ -64,7 +64,24 @@ rake
 
 なんとかして、SSLの証明書を用意するw。
 
+出来たら、
+ssl配下に配置する。名前は以下の様にする。
+
+- key.pem
+- cert.pem
+
 - http://kjunichi.cocolog-nifty.com/misc/2013/09/llhttps-0db2.html
+
+### それが出来ない人
+
+諦めが肝心w
+
+trusterd.conf.rbを以下の様に編集することで、TLSを無効化出来る。
+
+```diff
+- # :tls => false,
++   :tls => false,
+```
 
 ## 動かす
 
