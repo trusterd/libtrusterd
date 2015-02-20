@@ -4,7 +4,6 @@ trustred is a one of the famous web server which implements http2 by mruby langu
 
 I know a word isomorphic.But Some time I like to use some languages at the same time.
 It's so fun.
-So, I make it this.
 
 you can use http2 server with your favorite language which support libffi.
 
