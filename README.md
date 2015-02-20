@@ -6,6 +6,6 @@ I know a word isomorphic.But Some time I like to use some languages at the same 
 It's so fun.
 So, I make it this.
 
-You can link this libtrustred by libffi,thren you can start http2 server by your favorite language which support libffi.
+you can use http2 server with your favorite language which support libffi.
 
 [Japanese](README.ja.md)
