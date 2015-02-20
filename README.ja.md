@@ -64,13 +64,17 @@ rake
 
 なんとかして、SSLの証明書を用意するw。
 
+以下の記事が多少参考になるかも。。
+
+- http://kjunichi.cocolog-nifty.com/misc/2013/09/llhttps-0db2.html
+ 
 出来たら、
 ssl配下に配置する。名前は以下の様にする。
 
 - key.pem
 - cert.pem
 
-- http://kjunichi.cocolog-nifty.com/misc/2013/09/llhttps-0db2.html
+
 
 ### それが出来ない人
 
