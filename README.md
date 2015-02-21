@@ -40,6 +40,7 @@ cp cert.pem key.pem ssl
 cd examples
 npm install kjunichi/node-ffi
 npm install ref
+ln -s ../ssl .
 node trusterd &
 open https://127.0.0.1:8080/test
 ```
