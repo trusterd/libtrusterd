@@ -117,6 +117,10 @@ if s.request.uri == "/test"
   p "test"
   MyCall.my_exec("this is trusterd!")
   s.set_content_cb {
+    s.rputs s.unparsed_uri+"\n"
+    if s.body
+      s.rputs s.body+"\n"
+    end
     s.rputs "hello trusterd!"
   }
 end
