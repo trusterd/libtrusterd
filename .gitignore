@@ -7,3 +7,5 @@ ssl/cert.csr
 ssl/cert.pem
 ssl/key.pem
 examples/ssl
+examples/htdocs
+examples/trusterdGo
