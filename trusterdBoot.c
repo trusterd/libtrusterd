@@ -64,6 +64,21 @@ void mrbAddMyCallBack(mrb_state* mrb, FUNCPTR cb)
 	#endif
 }
 
+int boot_from_filepath(char *filepath, FUNCPTR cb)
+{
+	assert(name != NULL);
+	/*
+	mrb_state* mrb = mrb_open();
+
+	mrbAddMyCallBack(mrb, cb);
+
+	mrb_load_string(mrb, name);
+	mrb_close(mrb);
+	return printf("hello %s\n", name);
+	*/
+	return -1;
+}
+
 int boot(char *name, FUNCPTR cb)
 {
 	assert(name != NULL);
