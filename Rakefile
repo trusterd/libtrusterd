@@ -22,6 +22,5 @@ task :all do
   ldflags_before_libs.chomp!()
   libs=`#{MRUBY_ROOT}/bin/mruby-config --libs`
   libs.chomp!()
-p ldflags_before_libs
 sh "gcc #{cflags} -shared -fPIC trusterdBoot.c #{ldflags} #{ldflags_before_libs} #{libs} -o #{LIB_FULL_NAME}"
 end

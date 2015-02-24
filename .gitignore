@@ -9,3 +9,4 @@ ssl/key.pem
 examples/ssl
 examples/htdocs
 examples/trusterdGo
+examples/a.out
