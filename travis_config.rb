@@ -1,36 +1,43 @@
-MRuby::Build.new('debug') do |conf|
-  toolchain :gcc
-  enable_debug
-
-  # include all core GEMs
-  conf.gembox 'full-core'
-  conf.cc.flags += %w(-Werror=declaration-after-statement)
-  conf.compilers.each do |c|
-    c.defines += %w(MRB_GC_STRESS MRB_GC_FIXED_ARENA)
-  end
-end
-
 MRuby::Build.new do |conf|
+  # load specific toolchain settings
+
   toolchain :gcc
 
-  # include all core GEMs
+  # enable_debug
+
+  conf.gem :github => 'matsumoto-r/mruby-simplehttp'
+  conf.gem :github => 'trusterd/mruby-http2'
+  conf.gem :github => 'iij/mruby-io'
+  conf.gem :github => 'iij/mruby-dir'
+  conf.gem :github => 'iij/mruby-socket'
+  conf.gem :github => 'iij/mruby-pack'
+  conf.gem :github => 'iij/mruby-process'
+  conf.gem :github => 'mattn/mruby-onig-regexp'
+  conf.gem :github => 'mattn/mruby-json'
+  conf.gem :github => "kou/mruby-pp"
+  conf.gem "../mrblib/trusterd-ext"
+
+  # include the default GEMs
   conf.gembox 'full-core'
-  conf.cc.flags += %w(-Werror=declaration-after-statement)
-  conf.compilers.each do |c|
-    c.defines += %w(MRB_GC_FIXED_ARENA)
+
+  # C compiler settings
+  if RUBY_PLATFORM =~ /linux/i
+    conf.cc do |cc|
+      cc.command = ENV['CC'] || 'qrintf-gcc'
+    end
+
+    # Linker settings
+    conf.linker do |linker|
+      # if you use upstream method, may not use jemalloc.
+      # under investigation ...
+      linker.flags_after_libraries << '-ljemalloc'
+    end
   end
-  conf.enable_bintest
-end
 
-MRuby::Build.new('cxx_abi') do |conf|
-  toolchain :gcc
-
-  conf.gembox 'full-core'
-  conf.cc.flags += %w(-Werror=declaration-after-statement)
-  conf.compilers.each do |c|
-    c.defines += %w(MRB_GC_FIXED_ARENA)
+  # when using openssl from brew
+  if RUBY_PLATFORM =~ /darwin/i
+    conf.linker do |linker|
+      linker.option_library_path << ' -L/usr/local/lib/ '
+    end
   end
-  conf.enable_bintest
-
-  enable_cxx_abi
 end
