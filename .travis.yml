@@ -1,0 +1,29 @@
+language: cpp
+compiler:
+  #  - gcc
+  - clang
+before_install:
+  - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+  - sudo apt-get -qq update
+install:
+  - sudo apt-get -qq install rake bison git gperf g++-4.8 libev-dev libevent-dev libjansson-dev libjemalloc-dev libxml2-dev libssl-dev zlib1g-dev
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
+  - git clone https://github.com/h2o/qrintf.git
+  - cd qrintf
+  - sudo make install PREFIX=/usr/local
+  - cd ..
+  - nvm install 0.12
+  - nvm use 0.12
+  - npm install -g mocha
+script:
+  - git clone https://github.com/mruby/mruby.git
+  - cd mruby
+  - cp -f ../build_config.rb .
+  - rake
+  - cd ..
+  - rake
+  - nm /home/travis/build/trusterd/libtrusterd/mruby/build/host/mrbgems/mruby-http2/nghttp2/lib/.libs/libnghttp2.a|sort
+  - export CXX=g++
+  - export CC=gcc
+  - npm install ref kjunichi/node-ffi
+  - mocha -gc --reporter spec

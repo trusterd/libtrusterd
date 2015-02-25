@@ -22,5 +22,12 @@ task :all do
   ldflags_before_libs.chomp!()
   libs=`#{MRUBY_ROOT}/bin/mruby-config --libs`
   libs.chomp!()
-sh "gcc #{cflags} -shared -fPIC trusterdBoot.c #{ldflags} #{ldflags_before_libs} #{libs} -o #{LIB_FULL_NAME}"
+  if RUBY_PLATFORM =~ /darwin/i
+    sh "gcc #{cflags} -shared -fPIC trusterdBoot.c #{ldflags} #{ldflags_before_libs} #{libs} -o #{LIB_FULL_NAME}"
+  end
+  if RUBY_PLATFORM =~ /linux/i
+    ldflags_before_libs.gsub!("libnghttp2.a","")
+    sh "echo #{ldflags_before_libs}"
+    sh "clang -shared #{cflags} -fPIC trusterdBoot.c #{ldflags} -L#{ldflags_before_libs} #{libs} -lnghttp2 -o #{LIB_FULL_NAME}"
+  end
 end

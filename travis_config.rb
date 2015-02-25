@@ -3,7 +3,7 @@ MRuby::Build.new do |conf|
 
   toolchain :gcc
 
-  enable_debug
+  # enable_debug
 
   conf.gem :github => 'matsumoto-r/mruby-simplehttp'
   conf.gem :github => 'trusterd/mruby-http2'
@@ -14,6 +14,8 @@ MRuby::Build.new do |conf|
   conf.gem :github => 'iij/mruby-process'
   conf.gem :github => 'mattn/mruby-onig-regexp'
   conf.gem :github => 'mattn/mruby-json'
+  conf.gem :github => "kou/mruby-pp"
+  conf.gem "../mrblib/trusterd-ext"
 
   # include the default GEMs
   conf.gembox 'full-core'
@@ -22,11 +24,12 @@ MRuby::Build.new do |conf|
   if RUBY_PLATFORM =~ /linux/i
     conf.cc do |cc|
       cc.command = ENV['CC'] || 'qrintf-gcc'
-      cc.flags << '-fPIC '
     end
 
     # Linker settings
     conf.linker do |linker|
+      # if you use upstream method, may not use jemalloc.
+      # under investigation ...
       linker.flags_after_libraries << '-ljemalloc'
     end
   end
