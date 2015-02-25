@@ -8,7 +8,7 @@ SO_EXT=".dylib";
 }
 
 var funcPtr = ffi.Function('int', ['string']);
-var mylib = ffi.Library('../libtrusterd'+SO_EXT, {
+var mylib = ffi.Library('libtrusterd'+SO_EXT, {
 'boot': ['int', ['string', funcPtr]]
 });
 // onReult will call by trusterd.
