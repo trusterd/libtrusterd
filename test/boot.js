@@ -10,15 +10,36 @@ var funcPtr = ffi.Function('int', ['string']);
 var mylib = ffi.Library('./libtrusterd', {
 'boot': ['int', ['string', funcPtr]]
 });
+var script = "puts 1+2";
 
 // onReult will call by trusterd.
 var onResult = function(resultVal) {
   console.log('Result is', resultVal);
+  //assert.equal(script.length,);
   return 0;
 }
 // start http2 trusterd.
-var script = "puts 1+2";
-assert.equal(3,mylib.boot(script,onResult));
+
+assert.equal(script.length,mylib.boot(script,onResult));
+});
+
+it('should be callback from mruby:)', function () {
+  var testString = "abc0123";
+var funcPtr = ffi.Function('int', ['string']);
+var mylib = ffi.Library('./libtrusterd', {
+'boot': ['int', ['string', funcPtr]]
+});
+var script = 'MyCall.my_exec('+testString+'')';
+
+// onReult will call by trusterd.
+var onResult = function(resultVal) {
+  console.log('Result is', resultVal);
+  assert.equal("",resultVal);
+  return 0;
+}
+// start http2 trusterd.
+
+//assert.equal(script.length,mylib.boot(script,onResult));
 });
 
 });
