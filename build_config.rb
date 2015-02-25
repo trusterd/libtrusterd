@@ -22,6 +22,7 @@ MRuby::Build.new do |conf|
   if RUBY_PLATFORM =~ /linux/i
     conf.cc do |cc|
       cc.command = ENV['CC'] || 'qrintf-gcc'
+      cc.flags << '-fPIC '
     end
 
     # Linker settings
