@@ -1,5 +1,7 @@
 # libtrusterd
 
+[![Build Status](https://travis-ci.org/trusterd/libtrusterd.svg?branch=master)](https://travis-ci.org/trusterd/libtrusterd)
+
 [Japanese](README.ja.md)
 
 trustred is a one of the famous web server which implements http2 by mruby language.
