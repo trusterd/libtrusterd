@@ -22,5 +22,11 @@ task :all do
   ldflags_before_libs.chomp!()
   libs=`#{MRUBY_ROOT}/bin/mruby-config --libs`
   libs.chomp!()
-sh "gcc #{cflags} -shared -fPIC trusterdBoot.c #{ldflags} #{ldflags_before_libs} #{libs} -o #{LIB_FULL_NAME}"
+  if RUBY_PLATFORM =~ /darwin/i
+    sh "gcc #{cflags} -shared -fPIC trusterdBoot.c #{ldflags} #{ldflags_before_libs} #{libs} -o #{LIB_FULL_NAME}"
+  end
+  if RUBY_PLATFORM =~ /linux/i
+    sh "clang #{cflags} -shared -fPIC trusterdBoot.c #{ldflags} #{ldflags_before_libs} #{libs} -o #{LIB_FULL_NAME}"
+  end
+  
 end
