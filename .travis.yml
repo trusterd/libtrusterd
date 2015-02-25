@@ -4,6 +4,7 @@ compiler:
   - clang
 before_install:
   - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+  - sudo add-apt-repository --yes ppa:chris-lea/node.js 
   - sudo apt-get -qq update
 install:
   - sudo apt-get -qq install rake bison git gperf g++-4.8 libev-dev libevent-dev libjansson-dev libjemalloc-dev libxml2-dev libssl-dev zlib1g-dev
@@ -12,10 +13,8 @@ install:
   - cd qrintf
   - sudo make install PREFIX=/usr/local
   - cd ..
-  - sudo add-apt-repository --yes ppa:chris-lea/node.js 
-  - sudo apt-get update
   - sudo apt-get install -y nodejs
-  - node -v
+  - sudo npm install -g mocha
   - which npm
 script:
   - git clone https://github.com/mruby/mruby.git
@@ -24,4 +23,6 @@ script:
   - rake
   - cd ..
   - rake
-  
+  - cd test
+  - npm install ref kjunichi/node-ffi
+  - mocha -gc --reporter spec
