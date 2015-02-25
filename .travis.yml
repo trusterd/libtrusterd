@@ -12,6 +12,9 @@ install:
   - cd qrintf
   - sudo make install PREFIX=/usr/local
   - cd ..
+  - nvm install 0.12
+  - nvm use 0.12
+  - npm install -g mocha
 script:
   - git clone https://github.com/mruby/mruby.git
   - cd mruby
@@ -19,4 +22,7 @@ script:
   - rake
   - cd ..
   - rake
-  
+  - export CXX=g++
+  - export CC=gcc
+  - npm install ref kjunichi/node-ffi
+  - mocha -gc --reporter spec
