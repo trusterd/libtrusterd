@@ -15,9 +15,6 @@ describe('libtrusterd boot test', function () {
     // onReult will call by trusterd.
     var onResult = function(resultVal) {
       assert(false) // shouldn't get here
-      console.log('Result is', resultVal);
-      
-      //assert.equal(script.length,);
       return 0;
     }
     
@@ -32,17 +29,16 @@ describe('libtrusterd boot test', function () {
     var mylib = ffi.Library('./libtrusterd', {
       'boot': ['int', ['string', funcPtr]]
     });
-    var script = 'MyCall.my_exec('+testString+')';
+    var script = 'MyCall.my_exec("'+testString+'")';
 
     // onReult will call by trusterd.
     var onResult = function(resultVal) {
       console.log('Result is', resultVal);
-      assert.equal("",resultVal);
+      assert.equal(testString,resultVal);
       return 0;
     }
-    // start http2 trusterd.
 
-    //assert.equal(script.length,mylib.boot(script,onResult));
+    mylib.boot(script,onResult);
   });
 });
 
