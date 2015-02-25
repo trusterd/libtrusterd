@@ -29,7 +29,7 @@ var funcPtr = ffi.Function('int', ['string']);
 var mylib = ffi.Library('./libtrusterd', {
 'boot': ['int', ['string', funcPtr]]
 });
-var script = 'MyCall.my_exec('+testString+'')';
+var script = 'MyCall.my_exec('+testString+')';
 
 // onReult will call by trusterd.
 var onResult = function(resultVal) {
