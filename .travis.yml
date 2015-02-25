@@ -12,6 +12,10 @@ install:
   - cd qrintf
   - sudo make install PREFIX=/usr/local
   - cd ..
+  - sudo add-apt-repository ppa:chris-lea/node.js 
+  - sudo apt-get update
+  - sudo apt-get install nodejs npm
+  - node -v
 script:
   - git clone https://github.com/mruby/mruby.git
   - cd mruby
