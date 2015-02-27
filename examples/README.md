@@ -27,3 +27,11 @@ npm install kjunichi/node-ffi
 npm install ref
 node trusterd.js
 ```
+# OCaml
+
+```
+opam install extlib ctypes
+ocamlfind ocamlopt -o trusterdML -linkpkg -package ctypes,ctypes.foreign,extlib trusterdML.ml 
+./trusterdML &
+```
+
