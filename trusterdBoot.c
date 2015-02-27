@@ -76,7 +76,8 @@ int boot_from_filepath(char *filepath, FUNCPTR cb)
 	
 	mrb_close(mrb);
 	
-	return printf("%s", name);
+	// TODO when we'll implement it,change to filepath to it's content's lenght.
+	return printf("%s", filepath);
 	
 	return -1; // because we've not implement this function yet :)
 }
