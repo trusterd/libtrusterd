@@ -10,3 +10,8 @@ examples/ssl
 examples/htdocs
 examples/trusterdGo
 examples/a.out
+*.cmi
+*.cmx
+*.o
+examples/trusterdML
+examples/mrubyML
