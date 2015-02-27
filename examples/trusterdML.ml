@@ -1,6 +1,7 @@
 open Ctypes
 open PosixTypes
 open Foreign
+open Std
 
 let cb_t = string @-> returning int;;
 
@@ -12,6 +13,13 @@ let f x =
 begin
  print_string x;
  -1;
-end;;
+end
 
-boot "puts 1+2;MyCall.my_exec('Hello,this is mruby!')" f
+
+let read_file filename =
+ let chan = open_in filename in
+  Std.input_all chan
+
+let rbscript = read_file "../trusterd.conf.rb";;
+
+boot rbscript f
