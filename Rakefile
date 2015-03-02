@@ -16,6 +16,9 @@ task :default => "all"
 task :all do
   cflags=`#{MRUBY_ROOT}/bin/mruby-config --cflags`
   cflags.chomp!()
+  cflags<<`pkg-config openssl --cflags`
+  cflags.chomp!()
+  cflags<<" -Imruby/include -Imruby/build/host/mrbgems/mruby-http2/nghttp2/lib/includes -Imruby/build/mrbgems/mruby-http2/src/"
   ldflags=`#{MRUBY_ROOT}/bin/mruby-config --ldflags`
   ldflags.chomp!()
   ldflags_before_libs=`#{MRUBY_ROOT}/bin/mruby-config --ldflags-before-libs`
