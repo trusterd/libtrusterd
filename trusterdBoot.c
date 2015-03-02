@@ -7,11 +7,7 @@
 #endif
 
 /* begin trusterd header */
-#include <netdb.h>
-#include <fcntl.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#include <nghttp2/nghttp2.h>
+#include "mrb_http2.h"
 #include "mrb_http2_gzip.h"
 
 
@@ -24,6 +20,9 @@
 #include "mruby/string.h"
 #include "mruby/object.h"
 /* begin trasuterd code */
+
+static char GZIP[] = "gzip";
+
 #define TRACER
 enum {
   IO_NONE,
@@ -48,15 +47,6 @@ struct mrb_http2_request_t {
   int32_t stream_id;
   nghttp2_gzip *inflater;
 };
-
-char *strcopy(const char *s, size_t len)
-{
-  char *dst;
-  dst = malloc(len+1);
-  memcpy(dst, s, len);
-  dst[len] = '\0';
-  return dst;
-}
 
 static ssize_t recv_callback(nghttp2_session *session, uint8_t *buf,
     size_t length, int flags, void *user_data)
@@ -506,6 +496,59 @@ static void mrb_http2_request_free(mrb_state *mrb,
   free(req->hostport);
   nghttp2_gzip_inflate_del(req->inflater);
 }
+static void mrb_http2_submit_request(mrb_state *mrb,
+struct mrb_http2_conn_t *conn, struct mrb_http2_request_t *req)
+{
+int32_t stream_id;
+const nghttp2_nv nva[] = {
+MAKE_NV(":method", "GET"),
+MAKE_NV_CS(":path", req->path),
+MAKE_NV(":scheme", "https"),
+MAKE_NV_CS(":authority", req->hostport),
+MAKE_NV("accept", "*/*"),
+MAKE_NV("accept-encoding", GZIP),
+MAKE_NV("user-agent", MRUBY_HTTP2_NAME"/"MRUBY_HTTP2_VERSION)
+};
+stream_id = nghttp2_submit_request(conn->session, NULL, nva,
+sizeof(nva)/sizeof(nva[0]), NULL, req);
+if(stream_id < 0) {
+mrb_raisef(mrb, E_RUNTIME_ERROR, "http2_submit_request: stream_id=(%S)",
+mrb_fixnum_value(stream_id));
+}
+req->stream_id = stream_id;
+mrb_hash_set(conn->mrb, conn->response,
+mrb_symbol_value(mrb_intern_cstr(conn->mrb, "stream_id")),
+mrb_fixnum_value(stream_id));
+}
+
+static void mrb_http2_ctl_poll(mrb_state *mrb, struct pollfd *pollfd,
+struct mrb_http2_conn_t *conn)
+{
+pollfd->events = 0;
+if(nghttp2_session_want_read(conn->session) ||
+conn->want_io == WANT_READ) {
+pollfd->events |= POLLIN;
+}
+if(nghttp2_session_want_write(conn->session) ||
+conn->want_io == WANT_WRITE) {
+pollfd->events |= POLLOUT;
+}
+}
+
+static void mrb_http2_exec_io(mrb_state *mrb, struct mrb_http2_conn_t *conn)
+{
+int rv;
+rv = nghttp2_session_recv(conn->session);
+if(rv != 0) {
+mrb_raisef(mrb, E_RUNTIME_ERROR, "nghttp2_session_recv: %S",
+mrb_fixnum_value(rv));
+}
+rv = nghttp2_session_send(conn->session);
+if(rv != 0) {
+mrb_raisef(mrb, E_RUNTIME_ERROR, "nghttp2_session_send: %S",
+mrb_fixnum_value(rv));
+}
+}
 
 static mrb_value mrb_http2_fetch_uri(mrb_state *mrb,
     const struct mrb_http2_uri_t *uri)
@@ -600,6 +643,86 @@ static mrb_value mrb_http2_fetch_uri(mrb_state *mrb,
 
   return conn.response;
 }
+
+static int parse_uri(struct mrb_http2_uri_t *res, const char *uri)
+{
+size_t len, i, offset;
+int ipv6addr = 0;
+memset(res, 0, sizeof(struct mrb_http2_uri_t));
+len = strlen(uri);
+if(len < 9 || memcmp("https://", uri, 8) != 0) {
+return -1;
+}
+offset = 8;
+res->host = res->hostport = &uri[offset];
+res->hostlen = 0;
+if(uri[offset] == '[') {
+++offset;
+++res->host;
+ipv6addr = 1;
+for(i = offset; i < len; ++i) {
+if(uri[i] == ']') {
+res->hostlen = i-offset;
+offset = i+1;
+break;
+}
+}
+} else {
+const char delims[] = ":/?#";
+for(i = offset; i < len; ++i) {
+if(strchr(delims, uri[i]) != NULL) {
+break;
+}
+}
+res->hostlen = i-offset;
+offset = i;
+}
+if(res->hostlen == 0) {
+return -1;
+}
+res->port = 443;
+if(offset < len) {
+if(uri[offset] == ':') {
+const char delims[] = "/?#";
+int port = 0;
+++offset;
+for(i = offset; i < len; ++i) {
+if(strchr(delims, uri[i]) != NULL) {
+break;
+}
+if('0' <= uri[i] && uri[i] <= '9') {
+port *= 10;
+port += uri[i]-'0';
+if(port > 65535) {
+return -1;
+}
+} else {
+return -1;
+}
+}
+if(port == 0) {
+return -1;
+}
+offset = i;
+res->port = port;
+}
+}
+res->hostportlen = uri+offset+ipv6addr-res->host;
+for(i = offset; i < len; ++i) {
+if(uri[i] == '#') {
+break;
+}
+}
+if(i-offset == 0) {
+res->path = "/";
+res->pathlen = 1;
+} else {
+res->path = &uri[offset];
+res->pathlen = i-offset;
+}
+return 0;
+}
+
 
 static mrb_value mrb_http2_client_get2(mrb_state *mrb, mrb_value self)
 {
