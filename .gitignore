@@ -1,7 +1,7 @@
 .DS_Store
 mruby
 libtrusterd.dylib
-libtrusterd.dylib.dSYM
+*.dSYM
 node_modules
 ssl/cert.csr
 ssl/cert.pem
@@ -15,3 +15,5 @@ examples/a.out
 *.o
 examples/trusterdML
 examples/mrubyML
+a.out
+foo.txt
