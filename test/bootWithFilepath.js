@@ -2,13 +2,13 @@ var assert = require('assert');
 var ref = require('ref');
 var ffi = require('ffi');
 
-describe('libtrusterd boot_with_filepath test', function() {
+describe('libtrusterd boot_from_file_path test', function() {
   afterEach(gc)
 
   it('should be work :)', function() {
     var funcPtr = ffi.Function('int', ['string']);
     var mylib = ffi.Library('./libtrusterd', {
-      'boot_with_filepath': ['int', ['string', funcPtr]]
+      'boot_from_file_path': ['int', ['string', funcPtr]]
     });
     var filepath = "./trusterd.test01.conf.rb";
 
