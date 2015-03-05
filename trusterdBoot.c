@@ -64,7 +64,7 @@ void mrbAddMyCallBack(mrb_state* mrb, FUNCPTR cb)
 	#endif
 }
 
-int boot_from_filepath(char *filepath, FUNCPTR cb)
+int boot_from_file_path(char *filepath, FUNCPTR cb)
 {
 	assert(filepath != NULL);
 	
