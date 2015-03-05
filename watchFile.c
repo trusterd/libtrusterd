@@ -18,7 +18,12 @@
 
 int checkFile(mrb_state *mrb, mrbc_context *cxt, char *filepath)
 {
-  return 0;
+  mrb_value val;
+
+  val = mrb_funcall(mrb, mrb_top_self(mrb), "checkFile", 1,
+  mrb_str_new_cstr(mrb, filepath));
+ 
+  return mrb_bool(val);
 }
 
 void watchFile(mrb_state *mrb, mrbc_context *cxt, char *filepath)
@@ -78,7 +83,9 @@ void watchFile(mrb_state *mrb, mrbc_context *cxt, char *filepath)
 			}
 		} else {
 			if (kev_r.fflags & NOTE_WRITE) {
+                            printf("%s\n","update dir");
 				if (checkFile(mrb, cxt, filepath) == 1) {
+                                        printf("%s\n","add file!");
 					// チェック対象だったら、fdを再取得して、これを監視対象にする。
 					fd = open(filepath, O_RDONLY);
 					EV_SET(&kev[0], fd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_DELETE | NOTE_WRITE, 0, NULL);
@@ -91,24 +98,27 @@ void watchFile(mrb_state *mrb, mrbc_context *cxt, char *filepath)
 
 int main(int argc, char **argv)
 {
-	mrb_state *mrb;
-	mrbc_context *cxt;
+  FILE* f;
+  mrb_state *mrb;
+  mrbc_context *cxt;
   mrb_value val;
 
 	char *filepath = "./foo.txt";
 
 	mrb = mrb_open();
 	cxt = mrbc_context_new(mrb);
-
+  f = fopen("checkFile.rb", "r");
+  mrb_load_file(mrb, f);
+  fclose(f);
   
   // File.realpath("./myfile.rb"))
   val = mrb_funcall(mrb, mrb_obj_value(mrb_class_get(mrb, "File")), "realpath", 1,
   mrb_str_new_cstr(mrb, filepath));
 
   char *fullpath = mrb_string_value_ptr(mrb, val);
-　printf("%s\n", fullpath);
+  printf("%s\n", fullpath);
 
-	watchFile(mrb, cxt, filepath);
+	watchFile(mrb, cxt, fullpath);
 
 	mrb_close(mrb);
 	exit(0);
