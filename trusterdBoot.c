@@ -23,6 +23,10 @@ FUNCPTR gcb;
 char trusterd_conf_path[1024];
 FILE *confFile = NULL;
 
+#ifdef __APPLE__
+extern const uint8_t checkFile[];
+#endif
+
 void setTrusterdConfPath(const char *filepath)
 {
   strncpy(trusterd_conf_path, filepath, 1023);
@@ -62,8 +66,7 @@ static mrb_value runTrusterd(mrb_state *mrb, mrb_value obj)
 static mrb_value dofork(mrb_state *mrb, const char *filepath)
 {
   mrb_value val;
-  FILE *f;
- 
+
   /*
   struct RProc *blk;
   mrb_value val, proc;
@@ -134,7 +137,7 @@ mrb_value get_procpathname(mrb_state* mrb, mrb_value self)
   return mrb_str_new(mrb, pathbuf, strlen(pathbuf));
 }
 
-int checkFile(mrb_state *mrb, const char *filepath)
+int checkFileCall(mrb_state *mrb, const char *filepath)
 {
   mrb_value val;
 
@@ -166,7 +169,6 @@ const char *getDirname(mrb_state *mrb, const char *fullpath)
 
 int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
 {
-  FILE *f;
   int fd, dfd, kq;
   struct kevent kev[2], kev_r;
   int isFileWatching;
@@ -174,10 +176,7 @@ int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
   const char *fullpath;
   mrb_value pid;
 
-  // TODO mrbnized
-  f = fopen("checkFile.rb", "r");
-  mrb_load_file(mrb, f);
-  fclose(f);
+  mrb_load_irep(mrb, checkFile);
 
   fullpath = getFullpath(mrb, filepath);
   printf("%s\n", fullpath);
@@ -233,7 +232,7 @@ EV_SET(&kev[0], fd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_DELETE | N
     } else {
       if (kev_r.fflags & NOTE_WRITE) {
         printf("%s\n", "update dir");
-        if (checkFile(mrb, fullpath) == 1) {
+        if (checkFileCall(mrb, fullpath) == 1) {
           printf("%s\n", "add file!");
           // チェック対象だったら、fdを再取得して、これを監視対象にする。
           fd = open(fullpath, O_RDONLY);

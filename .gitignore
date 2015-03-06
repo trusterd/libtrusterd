@@ -17,3 +17,4 @@ examples/trusterdML
 examples/mrubyML
 a.out
 foo.txt
+checkFile.c
