@@ -19,6 +19,6 @@ describe('libtrusterd boot_from_file_path test', function() {
     }
 
     // start mruby
-    assert.equal(script.length, mylib.boot(filepath, onResult));
+    assert.equal(0, mylib.boot_from_file_path(filepath, onResult));
   });
 });

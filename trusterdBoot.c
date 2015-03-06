@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <unistd.h>
+#include <signal.h>
 
 #ifdef __APPLE__
 #include <unistd.h>
@@ -20,6 +21,7 @@
 typedef int (*FUNCPTR)(char *script);
 FUNCPTR gcb;
 char trusterd_conf_path[1024];
+FILE *confFile = NULL;
 
 void setTrusterdConfPath(const char *filepath)
 {
@@ -41,36 +43,81 @@ FUNCPTR getCallback()
 {
   return gcb;
 }
-
+/*
 static mrb_value runTrusterd(mrb_state *mrb, mrb_value obj)
 {
   FILE *f;
   char *filepath;
 
+  printf("start runTrusterd\n");
+  fflush(stdout);
   filepath = getTrusterdConfPath();
   f = fopen(filepath, "r");
   mrb_load_file(mrb, f);
   fclose(f);
   return mrb_nil_value();
 }
+*/
+
 static mrb_value dofork(mrb_state *mrb, const char *filepath)
 {
+  mrb_value val;
+  FILE *f;
+ 
+  /*
   struct RProc *blk;
   mrb_value val, proc;
 
+  printf("start dofork\n");
   setTrusterdConfPath(filepath);
+  printf("trusterdconfpath = %s\n",getTrusterdConfPath());
   blk = mrb_proc_new_cfunc(mrb, runTrusterd);
   proc = mrb_obj_value(blk);
 
-  val = mrb_funcall_with_block(mrb, mrb_obj_value(mrb_module_get(mrb, "Process")), mrb_intern_cstr(mrb, "fork"), 0, NULL, proc);
-
+  val = mrb_funcall_with_block(mrb, mrb_obj_value(mrb_module_get(mrb, "Process")), mrb_intern(mrb, "fork"), 0, NULL, proc);
+  */
+  printf("start dofork\n");
+  int pid;
+  switch (pid = fork()) {
+  case 0:
+    // start trusterd
+    printf("trusterd[%s] is starting...\n",filepath);
+    if(confFile != NULL) {
+      fclose(confFile);
+    }
+    confFile = fopen(filepath, "r");
+    if(confFile == NULL) {
+      printf("oops fopen[%s]!\n",filepath);
+    }
+    perror("fopen");
+    mrb_load_file(mrb, confFile);
+    fclose(confFile);
+    confFile = NULL;
+    _exit(0);
+    return  mrb_fixnum_value(0);
+  case -1:
+    perror("fork fail");
+    return  mrb_fixnum_value(-1);
+  default:
+    printf("trusterd has started.");
+    return mrb_fixnum_value(pid);
+  }
+  printf("end dofork\n");
   return val;
 }
 
-mrb_value reload(mrb_state *mrb, const char *filepath)
+mrb_value reload(mrb_state *mrb, mrb_value pid, const char *filepath)
 {
-  //mrb_funcall(mrb,mrb_obj_value(mrb_module_get(mrb, "Process")),"waitpid",1,val);
+  //mrb_value val;
+int status;
 
+  // kill pid
+  printf("kill pid = %d\n", mrb_fixnum(pid));
+  //val = mrb_funcall(mrb, mrb_obj_value(mrb_module_get(mrb, "Process")), "kill", 2, mrb_fixnum_value(9), pid);
+
+  //mrb_funcall(mrb,mrb_obj_value(mrb_module_get(mrb, "Process")),"waitpid",1,val);
+  kill(mrb_fixnum(pid),SIGTERM);
+  waitpid(mrb_fixnum(pid), &status, 0);
   return dofork(mrb, filepath);
 }
 
@@ -125,6 +172,7 @@ int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
   int isFileWatching;
   const char *dirpath;
   const char *fullpath;
+  mrb_value pid;
 
   // TODO mrbnized
   f = fopen("checkFile.rb", "r");
@@ -132,10 +180,16 @@ int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
   fclose(f);
 
   fullpath = getFullpath(mrb, filepath);
+  printf("%s\n", fullpath);
+
   fd = open(fullpath, O_RDONLY);
 
   dirpath = getDirname(mrb, fullpath);
   dfd = open(dirpath, O_RDONLY);
+
+  // まず起動する
+  pid = dofork(mrb, fullpath);
+
 
   kq = kqueue();
   EV_SET(&kev[0], fd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_DELETE | NOTE_WRITE, 0, NULL);
@@ -164,11 +218,15 @@ int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
     }
     if (isFileWatching == 1) {
       if (kev_r.ident == fd) {
-        if (kev_r.fflags & NOTE_WRITE)
+        if (kev_r.fflags & NOTE_WRITE) {
           printf("file was updated!\n");
-        else if (kev_r.fflags & NOTE_DELETE) {
+          close(fd);
+fd = open(fullpath, O_RDONLY);
+EV_SET(&kev[0], fd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_DELETE | NOTE_WRITE, 0, NULL);
+          pid = reload(mrb, pid, fullpath);
+        } else if (kev_r.fflags & NOTE_DELETE) {
           printf("file was deleted!\n");
-
+          close(fd);
           isFileWatching = 0;
         }
       }
@@ -178,8 +236,9 @@ int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
         if (checkFile(mrb, fullpath) == 1) {
           printf("%s\n", "add file!");
           // チェック対象だったら、fdを再取得して、これを監視対象にする。
-          fd = open(filepath, O_RDONLY);
+          fd = open(fullpath, O_RDONLY);
           EV_SET(&kev[0], fd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_DELETE | NOTE_WRITE, 0, NULL);
+          pid = reload(mrb, pid, fullpath);
           isFileWatching = 1;
         }
       }
