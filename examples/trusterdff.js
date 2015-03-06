@@ -12,7 +12,7 @@ if(process.platform === "win32") {
 
 
 var funcPtr = ffi.Function('int', ['string']);
-var mylib = ffi.Library('../libtrusterd'+LIBEXT, {
+var mylib = ffi.Library('../libtrusterd', {
   'boot_from_file_path': ['int', ['string', funcPtr]]
 });
 
