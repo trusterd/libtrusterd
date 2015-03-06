@@ -12,3 +12,4 @@ examples/trusterdGo
 examples/a.out
 a.out
 foo.txt
+checkFile.c
