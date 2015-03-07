@@ -1,6 +1,7 @@
 .DS_Store
 mruby
 libtrusterd.dylib
+libtrusterd.so
 *.dSYM
 node_modules
 ssl/cert.csr

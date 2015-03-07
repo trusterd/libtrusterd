@@ -4,13 +4,18 @@
 #include <unistd.h>
 #include <signal.h>
 
+#include <sys/types.h>
+
 #ifdef __APPLE__
 #include <unistd.h>
 #include <libproc.h>
-#include <sys/types.h>
 #include <sys/event.h>
 #include <sys/time.h>
 #include <fcntl.h>
+#endif
+
+#ifdef __linux
+#include <sys/wait.h>
 #endif
 
 #include "mruby.h"
