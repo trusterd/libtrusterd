@@ -3,7 +3,7 @@ var ref = require('ref');
 var ffi = require('ffi');
 
 describe('libtrusterd boot test', function () {
-  afterEach(gc)
+  //afterEach(gc)
 
   it('should be work :)', function () {
     var funcPtr = ffi.Function('int', ['string']);

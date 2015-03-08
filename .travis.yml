@@ -16,14 +16,14 @@ install:
   - nvm use 0.12
   - npm install -g mocha
 script:
+  - rvm use 2.2
   - git clone https://github.com/mruby/mruby.git
   - cd mruby
   - cp -f ../build_config.rb .
   - rake
   - cd ..
   - rake
-  - nm /home/travis/build/trusterd/libtrusterd/mruby/build/host/mrbgems/mruby-http2/nghttp2/lib/.libs/libnghttp2.a|sort
   - export CXX=g++
   - export CC=gcc
   - npm install ref kjunichi/node-ffi
-  - mocha -gc --reporter spec
+  - mocha --reporter spec
