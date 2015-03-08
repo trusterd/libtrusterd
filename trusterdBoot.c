@@ -28,9 +28,14 @@ FUNCPTR gcb;
 char trusterd_conf_path[1024];
 FILE *confFile = NULL;
 
+#ifdef __linux
+extern const uint8_t watchFileLinux[];
+#endif
+
 #ifdef __APPLE__
 extern const uint8_t checkFile[];
 #endif
+
 
 void setTrusterdConfPath(const char *filepath)
 {
@@ -128,6 +133,20 @@ int status;
   waitpid(mrb_fixnum(pid), &status, 0);
   return dofork(mrb, filepath);
 }
+
+#ifdef __linux
+int watchTrusterdConfFileInotify(mrb_state *mrb, char *filepath)
+{
+  mrb_value val;
+
+  mrb_load_irep(mrb, watchFileLinux);
+
+  val = mrb_funcall(mrb, mrb_top_self(mrb), "watchFileLinux", 1,
+                    mrb_str_new_cstr(mrb, filepath));
+  return 0;
+}
+
+#endif
 
 #ifdef __APPLE__
 mrb_value get_procpathname(mrb_state* mrb, mrb_value self)
@@ -286,6 +305,10 @@ int watchTrusterdConfFile(mrb_state *mrb, char *filepath)
         #ifdef __APPLE__
   return watchTrusterdConfFileKqueue(mrb, filepath);
         #endif
+#ifdef __linux
+  return watchTrusterdConfFileInotify(mrb, filepath);
+
+#endif
   return -1;
 }
 

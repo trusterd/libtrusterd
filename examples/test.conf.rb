@@ -37,7 +37,7 @@ s = HTTP2::Server.new({
   # required config
   #
 
-  :port           => 8082,
+  :port           => 8080,
   :document_root  => "#{root_dir}/htdocs",
   :server_name    => SERVER_DESCRIPTION,
 
@@ -62,7 +62,7 @@ s = HTTP2::Server.new({
   # :debug  =>  true,
 
   # tls default: true
-  # :tls => false,
+   :tls => false,
 
   # damone default: false
   # :daemon => true,

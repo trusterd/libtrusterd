@@ -19,3 +19,4 @@ examples/mrubyML
 a.out
 foo.txt
 checkFile.c
+watchFileLinux.c
