@@ -20,10 +20,10 @@ script:
   - git clone https://github.com/mruby/mruby.git
   - cd mruby
   - cp -f ../build_config.rb .
-  - rake --trace
+  - rake
   - cd ..
   - rake
   - export CXX=g++
   - export CC=gcc
   - npm install ref kjunichi/node-ffi
-  - mocha -gc --reporter spec
+  - mocha --reporter spec
