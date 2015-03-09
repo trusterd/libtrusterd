@@ -12,6 +12,7 @@
 #include <sys/event.h>
 #include <sys/time.h>
 #include <fcntl.h>
+#include <errno.h>
 #endif
 
 #ifdef __linux
@@ -58,59 +59,59 @@ FUNCPTR getCallback()
   return gcb;
 }
 /*
-static mrb_value runTrusterd(mrb_state *mrb, mrb_value obj)
-{
-  FILE *f;
-  char *filepath;
+   static mrb_value runTrusterd(mrb_state *mrb, mrb_value obj)
+   {
+   FILE *f;
+   char *filepath;
 
-  printf("start runTrusterd\n");
-  fflush(stdout);
-  filepath = getTrusterdConfPath();
-  f = fopen(filepath, "r");
-  mrb_load_file(mrb, f);
-  fclose(f);
-  return mrb_nil_value();
-}
-*/
+   printf("start runTrusterd\n");
+   fflush(stdout);
+   filepath = getTrusterdConfPath();
+   f = fopen(filepath, "r");
+   mrb_load_file(mrb, f);
+   fclose(f);
+   return mrb_nil_value();
+   }
+ */
 
 static mrb_value dofork(mrb_state *mrb, const char *filepath)
 {
   mrb_value val;
 
   /*
-  struct RProc *blk;
-  mrb_value val, proc;
+     struct RProc *blk;
+     mrb_value val, proc;
 
-  printf("start dofork\n");
-  setTrusterdConfPath(filepath);
-  printf("trusterdconfpath = %s\n",getTrusterdConfPath());
-  blk = mrb_proc_new_cfunc(mrb, runTrusterd);
-  proc = mrb_obj_value(blk);
+     printf("start dofork\n");
+     setTrusterdConfPath(filepath);
+     printf("trusterdconfpath = %s\n",getTrusterdConfPath());
+     blk = mrb_proc_new_cfunc(mrb, runTrusterd);
+     proc = mrb_obj_value(blk);
 
-  val = mrb_funcall_with_block(mrb, mrb_obj_value(mrb_module_get(mrb, "Process")), mrb_intern(mrb, "fork"), 0, NULL, proc);
-  */
+     val = mrb_funcall_with_block(mrb, mrb_obj_value(mrb_module_get(mrb, "Process")), mrb_intern(mrb, "fork"), 0, NULL, proc);
+   */
   printf("start dofork\n");
   int pid;
   switch (pid = fork()) {
   case 0:
     // start trusterd
-    printf("trusterd[%s] is starting...\n",filepath);
-    if(confFile != NULL) {
+    printf("trusterd[%s] is starting...\n", filepath);
+    if (confFile != NULL) {
       fclose(confFile);
     }
     confFile = fopen(filepath, "r");
-    if(confFile == NULL) {
-      printf("oops fopen[%s]!\n",filepath);
+    if (confFile == NULL) {
+      printf("oops fopen[%s]!\n", filepath);
     }
     perror("fopen");
     mrb_load_file(mrb, confFile);
     fclose(confFile);
     confFile = NULL;
     _exit(0);
-    return  mrb_fixnum_value(0);
+    return mrb_fixnum_value(0);
   case -1:
     perror("fork fail");
-    return  mrb_fixnum_value(-1);
+    return mrb_fixnum_value(-1);
   default:
     printf("trusterd has started.");
     return mrb_fixnum_value(pid);
@@ -122,14 +123,14 @@ static mrb_value dofork(mrb_state *mrb, const char *filepath)
 mrb_value reload(mrb_state *mrb, mrb_value pid, const char *filepath)
 {
   //mrb_value val;
-int status;
+  int status;
 
   // kill pid
   printf("kill pid = %d\n", mrb_fixnum(pid));
   //val = mrb_funcall(mrb, mrb_obj_value(mrb_module_get(mrb, "Process")), "kill", 2, mrb_fixnum_value(9), pid);
 
   //mrb_funcall(mrb,mrb_obj_value(mrb_module_get(mrb, "Process")),"waitpid",1,val);
-  kill(mrb_fixnum(pid),SIGTERM);
+  kill(mrb_fixnum(pid), SIGTERM);
   waitpid(mrb_fixnum(pid), &status, 0);
   return dofork(mrb, filepath);
 }
@@ -143,7 +144,7 @@ int watchTrusterdConfFileInotify(mrb_state *mrb, char *filepath)
 
   val = mrb_funcall(mrb, mrb_top_self(mrb), "watchFileLinux", 1,
                     mrb_str_new_cstr(mrb, filepath));
-  return 0;
+  return mrb_fixnum(val);
 }
 
 #endif
@@ -203,10 +204,15 @@ int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
   mrb_load_irep(mrb, checkFile);
 
   fullpath = getFullpath(mrb, filepath);
+  if (fullpath == NULL) {
+    return -1;
+  }
   printf("%s\n", fullpath);
 
   fd = open(fullpath, O_RDONLY);
-
+	if(fd<0) {
+		return -1;
+	}
   dirpath = getDirname(mrb, fullpath);
   dfd = open(dirpath, O_RDONLY);
 
@@ -220,7 +226,8 @@ int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
 
   if (kevent(kq, kev, 2, NULL, 0, NULL) == -1) {
     perror("kevent error");
-    exit(0);
+    //exit(0);
+    return -1;
   }
 
   isFileWatching = 1;
@@ -229,13 +236,17 @@ int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
     if (isFileWatching) {
       // ディレクトリとファイルを監視
       if (kevent(kq, kev, 2, &kev_r, 1, NULL) == -1) {
-        printf("kevent_r error\n");
-        exit(0);
+        printf("errno = %d\n", errno);
+        perror("kevent_r error\n");
+        if(errno == EINTR) {
+          return 0;
+        }
+        //exit(0);
       }
     } else {
       // ディレクトリのみ監視
       if (kevent(kq, &kev[1], 1, &kev_r, 1, NULL) == -1) {
-        printf("kevent_r error\n");
+        perror("kevent_r error\n");
         exit(0);
       }
     }
@@ -244,8 +255,8 @@ int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
         if (kev_r.fflags & NOTE_WRITE) {
           printf("file was updated!\n");
           close(fd);
-fd = open(fullpath, O_RDONLY);
-EV_SET(&kev[0], fd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_DELETE | NOTE_WRITE, 0, NULL);
+          fd = open(fullpath, O_RDONLY);
+          EV_SET(&kev[0], fd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_DELETE | NOTE_WRITE, 0, NULL);
           pid = reload(mrb, pid, fullpath);
         } else if (kev_r.fflags & NOTE_DELETE) {
           printf("file was deleted!\n");

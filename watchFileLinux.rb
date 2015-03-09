@@ -20,8 +20,11 @@ def reloadTrusterdConf(path,pid)
 end
 
 def watchFileLinux(path)
-
-  path=File.realpath(path)
+  begin
+    path=File.realpath(path)
+  rescue
+    return -1
+  end
   pid = runTrusterd(path)
   dirname = File.dirname(path)
   notifier = Inotify::Notifier.new

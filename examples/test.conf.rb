@@ -124,6 +124,16 @@ if s.request.uri == "/test"
     s.rputs "hello trusterd!"
   }
 end
+if s.request.uri == "/exit"
+  p "exit"
+  s.set_content_cb {
+    s.rputs s.unparsed_uri+"\n"
+    s.rputs "Good bye trusterd!"
+  }
+  p Process.pid
+  Process.kill('SIGTERM', Process.ppid)
+end
+
 #
 #
 }
@@ -142,19 +152,4 @@ end
 #   f.write "#{s.conn.client_ip} #{Time.now} - #{s.r.uri} - #{s.r.filename}\n"
 #
 # }
-#MyCall.my_exec("this is trudterd.")
-#p PyCall
 s.run
-
-#123
-#123
-#123
-#123
-#123
-#123
-#123
-#123
-p 'abcd'
-p 'abcd'
-p 'abcd'
-p 'abcd'
