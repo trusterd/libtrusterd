@@ -42,8 +42,8 @@ s = HTTP2::Server.new({
   :server_name    => SERVER_DESCRIPTION,
 
   # support prefork only when linux kernel supports SO_REUSEPORT
-  # :worker         => 4,
-  :worker         => "auto",
+   :worker         => 1,
+  #:worker         => "auto",
 
   # required when tls option is true.
   # tls option is true by default.
@@ -130,10 +130,11 @@ if s.request.uri == "/exit"
     s.rputs s.unparsed_uri+"\n"
     s.rputs "Good bye trusterd!"
   }
-  p Process.pid
-  Process.kill('SIGTERM', Process.ppid)
+  f = open("libtrusterd.pid","r")
+  pid = f.read
+  f.close
+  Process.kill('SIGTERM',pid.to_i*-1)
 end
-
 #
 #
 }
@@ -153,3 +154,4 @@ end
 #
 # }
 s.run
+p 123

@@ -22,7 +22,7 @@ describe('libtrusterd boot_from_file_path test', function() {
     // start mruby
     assert.equal(-1, mylib.boot_from_file_path(filepath, onResult));
   });
-  /*
+  
   it('should be work :)', function() {
     var funcPtr = ffi.Function('int', ['string']);
     var mylib = ffi.Library('./libtrusterd', {
@@ -37,8 +37,11 @@ describe('libtrusterd boot_from_file_path test', function() {
     }
 
     // start mruby
-    exec("sleep 1; mruby/build/host/mrbgems/mruby-http2/nghttp2/src/nghttp http://127.0.0.1:8080/exit");
+    
+exec("sleep 1; mruby/build/host/mrbgems/mruby-http2/nghttp2/src/nghttp http://127.0.0.1:8080/exit",
+function(err,stdout,stderr){console.log(stdout);console.log(stderr);});
+
     assert.equal(0, mylib.boot_from_file_path(filepath, onResult));
   });
-  */
+  
 });

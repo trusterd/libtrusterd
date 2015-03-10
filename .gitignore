@@ -20,3 +20,4 @@ a.out
 foo.txt
 checkFile.c
 watchFileLinux.c
+libtrusterd.pid

@@ -17,6 +17,7 @@ MRuby::Build.new do |conf|
   if RUBY_PLATFORM =~ /linux/i
     conf.gem :github => 'kjunichi/mruby-inotify'
     conf.gem :github => 'ksss/mruby-file-stat'
+    conf.gem :github => 'ksss/mruby-signal', :branch => 'master'
   end
 
   # include the default GEMs

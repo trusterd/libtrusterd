@@ -144,6 +144,20 @@ int watchTrusterdConfFileInotify(mrb_state *mrb, char *filepath)
 
   val = mrb_funcall(mrb, mrb_top_self(mrb), "watchFileLinux", 1,
                     mrb_str_new_cstr(mrb, filepath));
+  if(val.value.p == NULL) {
+    printf("mrb_val is null\n");
+    return 0;
+  }
+  printf("type %d\n",val.tt); 
+  if(val.tt == MRB_TT_EXCEPTION) { 
+    printf("now we've got exception");
+    return 0;
+  } 
+  fflush(stdout);
+  printf("watchFileLinux is end[%d].\n",mrb_fixnum(val));
+  mrb_funcall(mrb, mrb_top_self(mrb), "p", 1, val);
+  
+  fflush(stdout);
   return mrb_fixnum(val);
 }
 
@@ -337,7 +351,7 @@ int boot_from_file_path(char *filepath, FUNCPTR cb)
   //mrb_load_string(mrb, name);
 
   mrb_close(mrb);
-
+  printf("we now return[%d]\n",rtn);
   return rtn;
 }
 
