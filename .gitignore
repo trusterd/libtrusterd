@@ -21,3 +21,4 @@ foo.txt
 checkFile.c
 watchFileLinux.c
 libtrusterd.pid
+common.c

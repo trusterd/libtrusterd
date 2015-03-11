@@ -23,12 +23,13 @@ task :all do
   libs=`#{MRUBY_ROOT}/bin/mruby-config --libs`
   libs.chomp!()
   sh "#{MRUBY_ROOT}/bin/mrbc -BcheckFile checkFile.rb"
+  sh "#{MRUBY_ROOT}/bin/mrbc -BcommonUtil common.rb"
   if RUBY_PLATFORM =~ /darwin/i
-    sh "gcc #{cflags} -shared -fPIC trusterdBoot.c checkFile.c #{ldflags} #{ldflags_before_libs} #{libs} -o #{LIB_FULL_NAME}"
+    sh "gcc #{cflags} -shared -fPIC trusterdBoot.c checkFile.c common.c #{ldflags} #{ldflags_before_libs} #{libs} -o #{LIB_FULL_NAME}"
   end
   if RUBY_PLATFORM =~ /linux/i
     sh "#{MRUBY_ROOT}/bin/mrbc -BwatchFileLinux watchFileLinux.rb"
     ldflags_before_libs.gsub!("libnghttp2.a","")
-    sh "clang -shared #{cflags} -fPIC trusterdBoot.c watchFileLinux.c #{ldflags} -L#{ldflags_before_libs} #{libs} -lnghttp2 -o #{LIB_FULL_NAME}"
+    sh "clang -shared #{cflags} -fPIC trusterdBoot.c watchFileLinux.c common.c #{ldflags} -L#{ldflags_before_libs} #{libs} -lnghttp2 -o #{LIB_FULL_NAME}"
   end
 end
