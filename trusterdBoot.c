@@ -90,20 +90,20 @@ static mrb_value dofork(mrb_state *mrb, const char *filepath)
 
      val = mrb_funcall_with_block(mrb, mrb_obj_value(mrb_module_get(mrb, "Process")), mrb_intern(mrb, "fork"), 0, NULL, proc);
    */
-  printf("start dofork\n");
+  //printf("start dofork\n");
   int pid;
   switch (pid = fork()) {
   case 0:
     // start trusterd
-    printf("trusterd[%s] is starting...\n", filepath);
+    //printf("trusterd[%s] is starting...\n", filepath);
     if (confFile != NULL) {
       fclose(confFile);
     }
     confFile = fopen(filepath, "r");
     if (confFile == NULL) {
       printf("oops fopen[%s]!\n", filepath);
+      perror("fopen");
     }
-    perror("fopen");
     mrb_load_file(mrb, confFile);
     fclose(confFile);
     confFile = NULL;
@@ -113,10 +113,10 @@ static mrb_value dofork(mrb_state *mrb, const char *filepath)
     perror("fork fail");
     return mrb_fixnum_value(-1);
   default:
-    printf("trusterd has started.");
+    //printf("trusterd has started.");
     return mrb_fixnum_value(pid);
   }
-  printf("end dofork\n");
+  //printf("end dofork\n");
   return val;
 }
 
@@ -126,7 +126,7 @@ mrb_value reload(mrb_state *mrb, mrb_value pid, const char *filepath)
   int status;
 
   // kill pid
-  printf("kill pid = %d\n", mrb_fixnum(pid));
+  //printf("kill pid = %d\n", mrb_fixnum(pid));
   //val = mrb_funcall(mrb, mrb_obj_value(mrb_module_get(mrb, "Process")), "kill", 2, mrb_fixnum_value(9), pid);
 
   //mrb_funcall(mrb,mrb_obj_value(mrb_module_get(mrb, "Process")),"waitpid",1,val);
@@ -150,14 +150,14 @@ int watchTrusterdConfFileInotify(mrb_state *mrb, char *filepath)
   }
   printf("type %d\n",val.tt); 
   if(val.tt == MRB_TT_EXCEPTION) { 
-    printf("now we've got exception");
+    printf("now we've got exception\n");
     return 0;
   } 
-  fflush(stdout);
-  printf("watchFileLinux is end[%d].\n",mrb_fixnum(val));
-  mrb_funcall(mrb, mrb_top_self(mrb), "p", 1, val);
+  //fflush(stdout);
+  //printf("watchFileLinux is end[%d].\n",mrb_fixnum(val));
+  //mrb_funcall(mrb, mrb_top_self(mrb), "p", 1, val);
   
-  fflush(stdout);
+  //fflush(stdout);
   return mrb_fixnum(val);
 }
 
@@ -221,7 +221,7 @@ int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
   if (fullpath == NULL) {
     return -1;
   }
-  printf("%s\n", fullpath);
+  //printf("%s\n", fullpath);
 
   fd = open(fullpath, O_RDONLY);
 	if(fd<0) {
@@ -351,7 +351,7 @@ int boot_from_file_path(char *filepath, FUNCPTR cb)
   //mrb_load_string(mrb, name);
 
   mrb_close(mrb);
-  printf("we now return[%d]\n",rtn);
+  //printf("we now return[%d]\n",rtn);
   return rtn;
 }
 

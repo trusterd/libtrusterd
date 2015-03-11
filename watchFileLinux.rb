@@ -1,27 +1,37 @@
+def kill_children
+  pid = Process.pid
+  childrenPid = `pgrep -P #{pid}`
+  childrenPid = childrenPid.split("\n")
+  puts "children pid : " + childrenPid.to_s
+  childrenPid.each{|pid|
+    begin
+      Process.kill('SIGTERM',pid.to_i)
+      Process.waitpid(pid.to_i)
+    rescue => e
+      p e
+      p "but we continue"
+    end
+  }
+end 
+
+def set_sigterm
+  pid = Process.pid
+  pr = Proc.new { |signo|
+    puts "SIGTERM!"
+    kill_children
+    exit(0)
+  }
+  Signal.trap(:TERM, pr)
+end
+
 def runTrusterd(path)
 #  p path
   mypid = Process.fork {
     f = File.open(path,"r")
     conf = f.read
     f.close
-    pid = Process.pid
-    pr = Proc.new { |signo|
-      puts "SIGTERM!"
-      childrenPid = pid.to_i * (-1)
-      puts "children pid : " + childrenPid.to_s
-      begin
-        Process.kill('SIGTERM',childrenPid)
-        Process.waitpid(childrenPid)
-      rescue => e
-        p e
-        p "but we continue"
-      end
-      exit(0)
-      break 0
-    }
-    Signal.trap(:TERM, pr)
+    set_sigterm
     eval conf
-    break 0
   }
   if(mypid == 0) 
     puts "Oops! pid=0,so we exit it"
@@ -47,8 +57,6 @@ def watchFileLinux(path)
   f.write Process.pid
   f.close
 
-  puts "watchFileLinux start["+Process.pid.to_s+"]"
-
   begin
     path=File.realpath(path)
   rescue
@@ -56,7 +64,8 @@ def watchFileLinux(path)
   end
 
   pid = runTrusterd(path)
-  puts "Now start trusterd pid : " + pid.to_s
+#  puts "Now start trusterd pid : " + pid.to_s
+  set_sigterm
   dirname = File.dirname(path)
   notifier = Inotify::Notifier.new
   notifier.watch(dirname, :all_events) do |event|
