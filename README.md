@@ -12,7 +12,7 @@ It's so fun.
 you can use http2 server with your favorite language which support libffi.
 
 
-## Getting start
+## Getting started
 
 ```bash
 git clone https://github.com/kjunichi/libtrusterd.git
