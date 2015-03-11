@@ -29,6 +29,8 @@ FUNCPTR gcb;
 char trusterd_conf_path[1024];
 FILE *confFile = NULL;
 
+extern const uint8_t commonUtil[];
+
 #ifdef __linux
 extern const uint8_t watchFileLinux[];
 #endif
@@ -77,6 +79,7 @@ FUNCPTR getCallback()
 static mrb_value dofork(mrb_state *mrb, const char *filepath)
 {
   mrb_value val;
+  struct RClass *libtrd;
 
   /*
      struct RProc *blk;
@@ -96,6 +99,8 @@ static mrb_value dofork(mrb_state *mrb, const char *filepath)
   case 0:
     // start trusterd
     //printf("trusterd[%s] is starting...\n", filepath);
+    libtrd = mrb_module_get(mrb, "Libtrusterd");
+    val = mrb_funcall(mrb,mrb_obj_value(mrb_class_get_under(mrb, libtrd, "Util")),"set_sigterm", 0, NULL);
     if (confFile != NULL) {
       fclose(confFile);
     }
@@ -214,9 +219,17 @@ int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
   const char *dirpath;
   const char *fullpath;
   mrb_value pid;
+  struct RClass *libtrd;
+  mrb_value val;
 
   mrb_load_irep(mrb, checkFile);
 
+  libtrd = mrb_module_get(mrb, "Libtrusterd");
+  printf("Util.write_pid before\n");
+  val = mrb_funcall(mrb, mrb_obj_value(mrb_class_get_under(mrb, libtrd, "Util")),"write_pid", 0, NULL); 
+  printf("Util.write_pid after\n");
+
+  mrb_funcall(mrb, mrb_top_self(mrb), "p", 1, val);			  
   fullpath = getFullpath(mrb, filepath);
   if (fullpath == NULL) {
     return -1;
@@ -229,6 +242,8 @@ int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
 	}
   dirpath = getDirname(mrb, fullpath);
   dfd = open(dirpath, O_RDONLY);
+
+  val = mrb_funcall(mrb,mrb_obj_value(mrb_class_get_under(mrb, libtrd, "Util")),"set_sigterm", 0, NULL);
 
   // まず起動する
   pid = dofork(mrb, fullpath);
@@ -344,6 +359,7 @@ int boot_from_file_path(char *filepath, FUNCPTR cb)
   assert(filepath != NULL);
 
   mrb_state* mrb = mrb_open();
+  mrb_load_irep(mrb, commonUtil);
 
   mrbAddMyCallBack(mrb, cb);
 
