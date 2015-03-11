@@ -135,7 +135,7 @@ if s.request.uri == "/exit"
   f.close
    puts "now kill pid = " + pid.to_s
   Process.fork {
-    sleep(0.3)
+    sleep(0.5)
     Process.kill('SIGTERM',pid.to_i)
     Process.waitpid(pid.to_i)
     puts "Now all done,so I'm gonna exit."
