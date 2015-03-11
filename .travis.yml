@@ -26,4 +26,4 @@ script:
   - export CXX=g++
   - export CC=gcc
   - npm install ref kjunichi/node-ffi
-  - mocha --reporter spec
+  - mocha --reporter spec --timeout 5000
