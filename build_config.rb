@@ -14,10 +14,10 @@ MRuby::Build.new do |conf|
   conf.gem :github => 'iij/mruby-process'
   conf.gem :github => 'mattn/mruby-onig-regexp'
   conf.gem :github => 'mattn/mruby-json'
+  conf.gem :github => 'ksss/mruby-signal', :branch => 'master'
   if RUBY_PLATFORM =~ /linux/i
     conf.gem :github => 'kjunichi/mruby-inotify'
     conf.gem :github => 'ksss/mruby-file-stat'
-    conf.gem :github => 'ksss/mruby-signal', :branch => 'master'
   end
 
   # include the default GEMs
