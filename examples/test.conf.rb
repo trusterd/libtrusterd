@@ -62,7 +62,7 @@ s = HTTP2::Server.new({
   # :debug  =>  true,
 
   # tls default: true
-   :tls => false,
+  # :tls => false,
 
   # damone default: false
   # :daemon => true,
@@ -143,6 +143,16 @@ if s.request.uri == "/exit"
   }
 end
 #
+if s.request.uri == "/ldd"
+  s.set_content_cb {
+    puts "/ldd start"
+    procpath=Getprocpath.get
+    #p procpath
+    ldd = `otool -L #{procpath}`
+    #p ldd
+    s.rputs ldd
+  }
+end
 #
 }
 
