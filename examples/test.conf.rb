@@ -112,9 +112,9 @@ s = HTTP2::Server.new({
 #   if s.request.filename =~ /^.*\_shared.rb$/
 #     s.enable_shared_mruby
 #   end
-if s.request.uri == "/test"
+if s.request.uri == "/cgi"
   p s.request
-  p "test"
+  p "cgi"
 
   s.set_content_cb {
     s.rputs s.unparsed_uri+"\n"
@@ -124,6 +124,20 @@ if s.request.uri == "/test"
     s.rputs("retrun = [" + Libtrusterd::Cgi.cgi_proc("{uri:hoge,param:1}")+"]\n")
   }
 end
+
+if s.request.uri == "/test"
+  p s.request
+  p "test"
+  MyCall.my_exec("this is trusterd!")
+  s.set_content_cb {
+    s.rputs s.unparsed_uri+"\n"
+    if s.body
+      s.rputs s.body+"\n"
+    end
+    s.rputs "hello trusterd!"
+  }
+end
+
 if s.request.uri == "/exit"
   p "exit"
   s.set_content_cb {
