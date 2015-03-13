@@ -1,6 +1,20 @@
 module Libtrusterd
   class Util
 
+
+    def Util.ldd
+      path = Getprocpath.get
+      lddcmd = `which ldd`
+      if lddcmd.length == 0
+        # sorry for windows
+        lddcmd = "otool -L"
+      else
+        lddcmd="ldd"
+      end
+      rtn = `#{lddcmd} #{path}`
+      return rtn
+    end
+
     def Util.write_pid
       f = File.open('libtrusterd.pid','w')
       f.write Process.pid
@@ -32,9 +46,11 @@ module Libtrusterd
       }
       Signal.trap(:TERM, pr)
     end
+
   end
 end
 
 #Libtrusterd::Util.write_pid
 #Libtrusterd::Util.set_sigterm
 #sleep(1000)
+#puts Libtrusterd::Util.ldd

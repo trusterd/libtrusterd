@@ -153,15 +153,15 @@ int watchTrusterdConfFileInotify(mrb_state *mrb, char *filepath)
     printf("mrb_val is null\n");
     return 0;
   }
-  printf("type %d\n",val.tt); 
-  if(val.tt == MRB_TT_EXCEPTION) { 
+  printf("type %d\n",val.tt);
+  if(val.tt == MRB_TT_EXCEPTION) {
     printf("now we've got exception\n");
     return 0;
-  } 
+  }
   //fflush(stdout);
   //printf("watchFileLinux is end[%d].\n",mrb_fixnum(val));
   //mrb_funcall(mrb, mrb_top_self(mrb), "p", 1, val);
-  
+
   //fflush(stdout);
   return mrb_fixnum(val);
 }
@@ -226,10 +226,10 @@ int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
 
   libtrd = mrb_module_get(mrb, "Libtrusterd");
   printf("Util.write_pid before\n");
-  val = mrb_funcall(mrb, mrb_obj_value(mrb_class_get_under(mrb, libtrd, "Util")),"write_pid", 0, NULL); 
+  val = mrb_funcall(mrb, mrb_obj_value(mrb_class_get_under(mrb, libtrd, "Util")),"write_pid", 0, NULL);
   printf("Util.write_pid after\n");
 
-  mrb_funcall(mrb, mrb_top_self(mrb), "p", 1, val);			  
+  mrb_funcall(mrb, mrb_top_self(mrb), "p", 1, val);
   fullpath = getFullpath(mrb, filepath);
   if (fullpath == NULL) {
     return -1;
@@ -244,7 +244,10 @@ int watchTrusterdConfFileKqueue(mrb_state *mrb, char *filepath)
   dfd = open(dirpath, O_RDONLY);
 
   val = mrb_funcall(mrb,mrb_obj_value(mrb_class_get_under(mrb, libtrd, "Util")),"set_sigterm", 0, NULL);
-
+  mrb_funcall(mrb, mrb_top_self(mrb), "p", 1, val);
+  if(mrb->exc) {
+    printf("Oops something went wrong.\n");
+  }
   // まず起動する
   pid = dofork(mrb, fullpath);
 
