@@ -113,8 +113,8 @@ s = HTTP2::Server.new({
 #     s.enable_shared_mruby
 #   end
 if s.request.uri == "/cgi"
-  #pp s.request
-  #p "cgi"
+  p s.request
+  p "cgi"
 
   s.set_content_cb {
     s.rputs s.unparsed_uri+"\n"
