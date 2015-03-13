@@ -352,6 +352,9 @@ mrb_value cgi_proc(mrb_state* mrb, mrb_value self)
   // 第一引数を引数にコールバック関数を実行する。
   mrb_get_args(mrb, "z", &script);
   str = (*getCgiCallback())(script);
+  val = mrb_str_new_cstr(mrb, str);
+  /*free(str);*/
+  return  val;
 }
 
 void mrbAddMyCallBack(mrb_state* mrb, FUNCPTR cb)
