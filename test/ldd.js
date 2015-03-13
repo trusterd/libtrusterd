@@ -15,6 +15,9 @@ describe('libtrusterd /ldd test', function() {
       if(process.platform == "linux") {
         assert((rtn.indexOf("libc.so")>0) && (rtn.indexOf("libdl.so")>0));
       }
+      if(process.platform == "darwin") {
+	assert((rtn.indexOf("libSystem")>0));
+      }
       exec("mruby/build/host/mrbgems/mruby-http2/nghttp2/src/nghttp http://127.0.0.1:8080/exit",
           function(err,stdout,stderr){
             console.log(stdout);
