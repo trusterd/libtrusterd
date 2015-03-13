@@ -115,13 +115,13 @@ s = HTTP2::Server.new({
 if s.request.uri == "/test"
   p s.request
   p "test"
-  MyCall.my_exec("this is trusterd!")
+
   s.set_content_cb {
     s.rputs s.unparsed_uri+"\n"
     if s.body
       s.rputs s.body+"\n"
     end
-    s.rputs "hello trusterd!"
+    s.rputs("retrun = [" + Libtrusterd::Cgi.cgi_proc("{uri:hoge,param:1}")+"]\n")
   }
 end
 if s.request.uri == "/exit"
