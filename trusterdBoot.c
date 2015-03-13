@@ -384,7 +384,7 @@ void mrbAddCgiCallBack(mrb_state* mrb, FUNCCGIPTR cb)
   // クラスを定義する
   cls = mrb_define_class_under(mrb, module, "Cgi", mrb->object_class);
   // クラスメソッドを定義する
-  mrb_define_class_method(mrb, cls, "cgi_proc", cgi_proc, ARGS_REQ(1));
+  mrb_define_class_method(mrb, cls, "cgi_proc", cgi_proc, MRB_ARGS_REQ(1));
 }
 int watchTrusterdConfFile(mrb_state *mrb, char *filepath)
 {
