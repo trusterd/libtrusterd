@@ -346,7 +346,7 @@ mrb_value cgi_proc(mrb_state* mrb, mrb_value self)
 {
   char *script;
 
-  printf("cgi call: start\n");
+  //printf("cgi call: start\n");
   // 第一引数を引数にコールバック関数を実行する。
   mrb_get_args(mrb, "z", &script);
 

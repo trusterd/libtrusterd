@@ -16,8 +16,8 @@ var onResult = function(resultVal) {
 }
 
 var onRequest = function(resultVal) {
-  console.log('Result is', resultVal);
-  return "<html>Hello, trusted,this is node.js.</html>";
+  //console.log('Result is', resultVal);
+  return "<html>Hello, trusted,this is node.js.["+resultVal+"]</html>";
 }
 // start http2 trusterd.
 mylib.boot_from_file_path_cgi("examples/test.conf.rb",onRequest);

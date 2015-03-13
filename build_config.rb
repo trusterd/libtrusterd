@@ -16,7 +16,7 @@ MRuby::Build.new do |conf|
   conf.gem :github => 'mattn/mruby-json'
   conf.gem :github => 'kjunichi/mruby-getprocpath'
   conf.gem :github => 'ksss/mruby-signal', :branch => 'master'
-  
+  conf.gem :github => "kou/mruby-pp"
   if RUBY_PLATFORM =~ /linux/i
     conf.gem :github => 'kjunichi/mruby-inotify'
     conf.gem :github => 'ksss/mruby-file-stat'
