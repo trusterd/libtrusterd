@@ -14,6 +14,7 @@ examples/a.out
 *.cmi
 *.cmx
 *.o
+*~
 examples/trusterdML
 examples/mrubyML
 a.out
