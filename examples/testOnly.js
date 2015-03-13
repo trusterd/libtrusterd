@@ -20,5 +20,5 @@ var onRequest = function(resultVal) {
   return "<html>Hello, trusted,this is node.js.</html>";
 }
 // start http2 trusterd.
-mylib.boot_from_file_path("examples/test.conf.rb",onResult);
+mylib.boot_from_file_path_cgi("examples/test.conf.rb",onRequest);
 //

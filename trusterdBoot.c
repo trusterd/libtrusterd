@@ -344,7 +344,7 @@ mrb_value exec(mrb_state* mrb, mrb_value self)
 
 mrb_value cgi_proc(mrb_state* mrb, mrb_value self)
 {
-  char *script;
+<<<<<<< HEAD
   mrb_value val;
   char *str;
 
