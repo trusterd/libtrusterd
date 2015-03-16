@@ -19,15 +19,16 @@ def py_cb_func(script):
   return 0
 
 def py_cb_cgi_func(script):
-  print("py_cb_cgi_func",script)
+  #print("py_cb_cgi_func",script)
   msg = "Hello, Trusterd.this is Python."
   buf = create_string_buffer(msg.encode('UTF-8'))
-  c = ctypes.cast(buf, ctypes.POINTER(ctypes.c_char))
-  #return POINTER(b"Hello, Trusterd.this is Python.")
-  return ctypes.addressof(c.contents)
+  c = cast(buf, POINTER(c_char))
+  return addressof(c.contents)
+  #return buf
 
 CBFUNC=CFUNCTYPE(c_int,c_char_p)
 cbfunc=CBFUNC(py_cb_func)
+#CBCGIFUNC=CFUNCTYPE(c_int,c_char_p)
 CBCGIFUNC=CFUNCTYPE(c_char_p,c_char_p)
 cbcgifunc=CBCGIFUNC(py_cb_cgi_func)
 
