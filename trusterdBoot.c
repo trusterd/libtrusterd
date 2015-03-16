@@ -345,12 +345,16 @@ mrb_value exec(mrb_state* mrb, mrb_value self)
 mrb_value cgi_proc(mrb_state* mrb, mrb_value self)
 {
   char *script;
+  mrb_value val;
+  char *str;
 
   //printf("cgi call: start\n");
   // 第一引数を引数にコールバック関数を実行する。
   mrb_get_args(mrb, "z", &script);
-
-  return  mrb_str_new_cstr(mrb,(*getCgiCallback())(script));
+  str = (*getCgiCallback())(script);
+  val = mrb_str_new_cstr(mrb, str);
+  /*free(str);*/
+  return  val;
 }
 
 void mrbAddMyCallBack(mrb_state* mrb, FUNCPTR cb)

@@ -5,9 +5,13 @@ open Std
 
 let cb_t = string @-> returning int;;
 
+let cgi_cb_t = string @-> returning string;;
+
 Dl.dlopen ~filename:"../libtrusterd.dylib" ~flags:[Dl.RTLD_NOW]
 
 let boot = foreign "boot" (string @-> funptr cb_t @-> returning int)
+
+let boot_cgi = foreign "boot_from_file_path_cgi" (string @-> funptr cgi_cb_t @-> returning int)
 
 let f x =
 begin
@@ -15,6 +19,11 @@ begin
  -1;
 end
 
+let g x =
+begin
+ (*print_string x;*)
+ "This is OCaml.";
+end
 
 let read_file filename =
  let chan = open_in filename in
@@ -22,4 +31,5 @@ let read_file filename =
 
 let rbscript = read_file "../trusterd.conf.rb";;
 
-boot rbscript f
+(*boot rbscript f *)
+boot_cgi "./test.conf.rb" g
