@@ -19,17 +19,20 @@ begin
  -1;
 end
 
+let response_str = "This is Ocaml.";;
+
 let g x =
 begin
  (*print_string x;*)
- "This is OCaml.";
+ x.[1] <- 'z';
+ response_str;
 end
 
 let read_file filename =
  let chan = open_in filename in
   Std.input_all chan
 
-let rbscript = read_file "../trusterd.conf.rb";;
+let rbscript = read_file "test.conf.rb";;
 
-(*boot rbscript f *)
-boot_cgi "./test.conf.rb" g
+boot rbscript f
+(*boot_cgi "./test.conf.rb" g*)
