@@ -352,8 +352,6 @@ mrb_value cgi_proc(mrb_state* mrb, mrb_value self)
   // 第一引数を引数にコールバック関数を実行する。
   mrb_get_args(mrb, "z", &script);
   str = (*getCgiCallback())(script);
-  /*free(str);*/
-  return  val;
 }
 
 void mrbAddMyCallBack(mrb_state* mrb, FUNCPTR cb)
@@ -382,7 +380,7 @@ void mrbAddCgiCallBack(mrb_state* mrb, FUNCCGIPTR cb)
   // クラスを定義する
   cls = mrb_define_class_under(mrb, module, "Cgi", mrb->object_class);
   // クラスメソッドを定義する
-  mrb_define_class_method(mrb, cls, "cgi_proc", cgi_proc, ARGS_REQ(1));
+  mrb_define_class_method(mrb, cls, "cgi_proc", cgi_proc, MRB_ARGS_REQ(1));
 }
 int watchTrusterdConfFile(mrb_state *mrb, char *filepath)
 {
