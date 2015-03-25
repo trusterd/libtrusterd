@@ -352,6 +352,7 @@ mrb_value cgi_proc(mrb_state* mrb, mrb_value self)
   // 第一引数を引数にコールバック関数を実行する。
   mrb_get_args(mrb, "z", &script);
   str = (*getCgiCallback())(script);
+  //printf("%s\n",script);
   val = mrb_str_new_cstr(mrb, str);
   /*free(str);*/
   return  val;
@@ -437,6 +438,10 @@ int boot_from_file_path(char *filepath, FUNCPTR cb)
 
 int boot(char *name, FUNCPTR cb)
 {
+  mrb_value val;
+  struct RString *str;
+  char *err_out;
+
   assert(name != NULL);
   mrb_state* mrb = mrb_open();
 
@@ -445,6 +450,14 @@ int boot(char *name, FUNCPTR cb)
   mrbAddMyCallBack(mrb, cb);
 
   mrb_load_string(mrb, name);
+  if(mrb->exc) {
+      val = mrb_obj_value(mrb->exc);
+      if (mrb_type(val) == MRB_TT_STRING) {
+        str = mrb_str_ptr(val);
+        err_out = str->as.heap.ptr;
+        printf("%s\n",err_out);
+      }
+  }
   mrb_close(mrb);
   return printf("%s", name);
 }
