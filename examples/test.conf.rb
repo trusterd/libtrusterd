@@ -78,7 +78,7 @@ s = HTTP2::Server.new({
 #
 # when :callback option is true,
 #
- s.set_map_to_strage_cb {
+ s.set_map_to_storage_cb {
 #
 #   p "callback bloack at set_map_to_strage_cb"
 #   p s.request.uri
@@ -121,19 +121,27 @@ if s.request.uri == "/cgi"
     if s.body
       s.rputs s.body+"\n"
     end
-    s.rputs("retrun = [" + Libtrusterd::Cgi.cgi_proc("{uri:hoge,param:1}")+"]\n")
+    myres = Libtrusterd::Cgi.cgi_proc("{uri:hoge,param:1}")
+    s.rputs("retrun = ["+myres+"]\n")
+    myres = ""
   }
 end
 
 if s.request.uri == "/test"
-  p s.request
-  p "test"
-  MyCall.my_exec("this is trusterd!")
+  #p s.request
+  #p "test"
+  #MyCall.my_exec("this is trusterd!")
+
+  $counter = $counter + 1
+  if ($counter%100000==0)
+    #GC.start
+  end
+
   s.set_content_cb {
-    s.rputs s.unparsed_uri+"\n"
-    if s.body
-      s.rputs s.body+"\n"
-    end
+    #s.rputs s.unparsed_uri+"\n"
+    #if s.body
+    #  s.rputs s.body+"\n"
+    #end
     s.rputs "hello trusterd!"
   }
 end
@@ -181,5 +189,6 @@ end
 #   f.write "#{s.conn.client_ip} #{Time.now} - #{s.r.uri} - #{s.r.filename}\n"
 #
 # }
+$counter=1
 s.run
 p 123
