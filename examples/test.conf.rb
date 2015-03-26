@@ -138,7 +138,7 @@ if s.request.uri == "/test"
   end
 
   s.set_content_cb {
-    #s.rputs s.unparsed_uri+"\n"
+    s.rputs s.unparsed_uri+"\n"
     #if s.body
     #  s.rputs s.body+"\n"
     #end
