@@ -4,6 +4,7 @@ module Libtrusterd
 
     def Util.ldd
       path = Getprocpath.get
+      Signal.trap(:SIGCLD, :SIG_IGN)
       lddcmd = `which ldd`
       if lddcmd.length == 0
         # sorry for windows
@@ -12,6 +13,7 @@ module Libtrusterd
         lddcmd="ldd"
       end
       rtn = `#{lddcmd} #{path}`
+      Signal.trap(:SIGCLD, :SIG_DFL)
       return rtn
     end
 
