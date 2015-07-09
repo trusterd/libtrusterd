@@ -337,9 +337,9 @@ void mrbAddMyCallBack(mrb_state* mrb, FUNCPTR cb)
   // クラスを定義する
 
   // クラスメソッドを定義する
-  mrb_define_class_method(mrb, hoge_module, "my_exec", exec, ARGS_REQ(1));
+  mrb_define_class_method(mrb, hoge_module, "my_exec", exec, MRB_ARGS_REQ(1));
         #ifdef __APPLE__
-  mrb_define_class_method(mrb, hoge_module, "procpathname", get_procpathname, ARGS_NONE());
+  mrb_define_class_method(mrb, hoge_module, "procpathname", get_procpathname, MRB_ARGS_NONE());
         #endif
 }
 
