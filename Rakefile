@@ -21,6 +21,7 @@ task :all do
   ldflags_before_libs=`#{MRUBY_ROOT}/bin/mruby-config --ldflags-before-libs`
   ldflags_before_libs.chomp!()
   libs=`#{MRUBY_ROOT}/bin/mruby-config --libs`
+  libs.gsub!("-lmruby","#{MRUBY_ROOT}/build/host/lib/libmruby.a")
   libs.chomp!()
   sh "#{MRUBY_ROOT}/bin/mrbc -BcheckFile checkFile.rb"
   sh "#{MRUBY_ROOT}/bin/mrbc -BcommonUtil common.rb"
