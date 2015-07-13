@@ -35,3 +35,23 @@ ocamlfind ocamlopt -o trusterdML -linkpkg -package ctypes,ctypes.foreign,extlib 
 ./trusterdML &
 ```
 
+# Rust
+
+```
+cd trusterd_rs
+cargo build
+```
+
+## OSX
+
+```
+install_name_tool -change libtrusterd.dylib ../../libtrusterd.dylib target/debug/trusterd_rs
+cargo run
+```
+
+## Linux
+
+```
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:../..
+cargo run
+```
