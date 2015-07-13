@@ -23,3 +23,5 @@ checkFile.c
 watchFileLinux.c
 libtrusterd.pid
 common.c
+Cargo.lock
+examples/trusterd_rs/target/*

@@ -1,0 +1,9 @@
+[package]
+name = "trusterd_rs"
+version = "0.1.0"
+authors = ["Junichi Kajiwara <junichi.kajiwara@gmail.com>"]
+build = "build.rs"
+[dependencies]
+
+libc = "0.1"
+
