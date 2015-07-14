@@ -55,3 +55,12 @@ cargo run
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:../..
 cargo run
 ```
+
+# Python
+
+```
+python trusterd.py
+```
+
+both 2.x,3.4 can run.
+

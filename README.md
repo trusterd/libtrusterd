@@ -46,6 +46,9 @@ ln -s ../ssl .
 node trusterd &
 open https://127.0.0.1:8080/test
 ```
+### For more examples
+
+See the [examples/README.md](examples/README.md) file.
 
 # Link
 
