@@ -4,7 +4,7 @@
 
 [Japanese](README.ja.md)
 
-trustred is a one of the famous web server which implements http2 by mruby language.
+[trusterd](http://trusterd.org/) is a one of the famous web server which implements http2 by mruby language.
 
 I know a word isomorphic.But Some time I like to use some languages at the same time.
 It's so fun.
