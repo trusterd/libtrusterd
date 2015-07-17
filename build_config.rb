@@ -40,8 +40,12 @@ MRuby::Build.new do |conf|
 
   # when using openssl from brew
   if RUBY_PLATFORM =~ /darwin/i
+    conf.cc do |cc|
+      cc.flags << '-I /usr/local/include -I/usr/local/opt/openssl/include'
+    end
+
     conf.linker do |linker|
-      linker.option_library_path << ' -L/usr/local/lib/ '
+      linker.option_library_path << ' -L/usr/local/lib/ -L/usr/local/opt/openssl/lib'
     end
   end
 end
