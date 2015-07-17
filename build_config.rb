@@ -40,9 +40,10 @@ MRuby::Build.new do |conf|
 
   # when using openssl from brew
   if RUBY_PLATFORM =~ /darwin/i
-    sh 'CFLAGS="-I/usr/local/opt/openssl/include";export CFLAGS'
-    sh 'LDFLAGS="-L/usr/local/opt/openssl/lib";export LDFLAGS'
-    
+    if !ENV['CFLAGS'] then
+      sh 'rake CFLAGS="-I/usr/local/opt/openssl/include" LDFLAGS="-L/usr/local/opt/openssl/lib" PKG_CONFIG_PATH="/usr/local/opt/openssl/lib/pkgconfig"'
+      exit
+    end 
     conf.cc do |cc|
       cc.flags << '-I /usr/local/include -I/usr/local/opt/openssl/include'
     end
