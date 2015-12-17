@@ -1,5 +1,4 @@
 var assert = require('assert');
-var ref = require('ref');
 var ffi = require('ffi');
 var exec = require('child_process').exec;
 var execSync = require('child_process').execSync;
