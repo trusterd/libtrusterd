@@ -21,7 +21,7 @@ install:
   - cd qrintf
   - sudo make install PREFIX=/usr/local
   - cd ..
-  - nodebrew install-binrary 5.2.0
+  - nodebrew install-binary 5.2.0
   - nodebrew use 5.2.0
   - npm install -g mocha
 script:
