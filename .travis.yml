@@ -12,20 +12,26 @@ install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get -qq install rake bison git gperf g++-4.8 libev-dev libevent-dev libjansson-dev libjemalloc-dev libxml2-dev libssl-dev zlib1g-dev; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi; fi
   # OSX
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install openssl libev nvm; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then mkdir ~/.nvm && export NVM_DIR=~/.nvm && source $(brew --prefix nvm)/nvm.sh; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew tap homebrew/dupes; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install openssl libev zlib; fi
+  - curl -L git.io/nodebrew | perl - setup
+  - export PATH=$HOME/.nodebrew/current/bin:$PATH
   - git clone https://github.com/h2o/qrintf.git
   - cd qrintf
   - sudo make install PREFIX=/usr/local
   - cd ..
-  - nvm install 5.2.0
-  - nvm use 5.2.0
+  - nodebrew install-binrary 5.2.0
+  - nodebrew use 5.2.0
   - npm install -g mocha
 script:
   - rvm use 2.2
   - git clone https://github.com/mruby/mruby.git
   - cd mruby
   - cp -f ../build_config.rb .
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig:/usr/local/opt/openssl/lib/pkgconfig"; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CXXFLAGS="-I/usr/local/opt/libev/include"; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CFLAGS="-I/usr/local/opt/libev/include -I/usr/local/opt/openssl/include"; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export LDFLAGS="-L/usr/local/lib -L/usr/local/opt/openssl/lib"; fi
   - rake
   - cd ..
   - rake
