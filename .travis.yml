@@ -29,7 +29,7 @@ script:
   - rake
   - cd ..
   - rake
-  - export CXX="g++-4.8 -std=c++11"
-  - export CC=gcc
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then export CXX="g++-4.8 -std=c++11"; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then export CC=gcc; fi
   - npm install node-ffi/node-ffi#gh-241
   - mocha --reporter spec --timeout 15000
