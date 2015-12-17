@@ -28,5 +28,5 @@ script:
   - rake
   - export CXX=g++
   - export CC=gcc
-  - npm install ref kjunichi/node-ffi
+  - npm install ref node-ffi/node-ffi#gh-241
   - mocha --reporter spec --timeout 15000
