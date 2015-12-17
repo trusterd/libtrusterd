@@ -12,7 +12,7 @@ install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get -qq install rake bison git gperf g++-4.8 libev-dev libevent-dev libjansson-dev libjemalloc-dev libxml2-dev libssl-dev zlib1g-dev; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi; fi
   # OSX
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install zlib openssl libev; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install openssl libev; fi
   - git clone https://github.com/h2o/qrintf.git
   - cd qrintf
   - sudo make install PREFIX=/usr/local
