@@ -23,7 +23,7 @@ go run trusterdGo.go
 # JavaScript
 
 ```
-npm install kjunichi/node-ffi
+npm install node-ffi/node-ffi#gh-241
 npm install ref
 node trusterd.js
 ```
