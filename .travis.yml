@@ -13,6 +13,7 @@ install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi; fi
   # OSX
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew tap homebrew/dupes; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install openssl libev zlib; fi
   - curl -L git.io/nodebrew | perl - setup
   - export PATH=$HOME/.nodebrew/current/bin:$PATH
