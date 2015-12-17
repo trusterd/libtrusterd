@@ -29,7 +29,7 @@ script:
   - rake
   - cd ..
   - rake
-  - export CXX="g++ -std=c++11"
+  - export CXX="g++-4.8 -std=c++11"
   - export CC=gcc
   - npm install node-ffi/node-ffi#gh-241
   - mocha --reporter spec --timeout 15000
