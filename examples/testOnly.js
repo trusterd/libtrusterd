@@ -1,5 +1,4 @@
 var fs = require('fs');
-var ref = require('ref');
 var ffi = require('ffi');
 
 var funcPtr = ffi.Function('int', ['string']);
