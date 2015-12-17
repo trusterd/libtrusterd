@@ -1,5 +1,4 @@
 var assert = require('assert');
-var ref = require('ref');
 var ffi = require('ffi');
 
 describe('libtrusterd boot test', function () {
