@@ -26,6 +26,10 @@
 
 typedef int (*FUNCPTR)(char *script);
 FUNCPTR gcb;
+
+typedef char *(*FUNCCGIPTR)(char *request_json);
+FUNCCGIPTR gcgicb;
+
 char trusterd_conf_path[1024];
 FILE *confFile = NULL;
 
@@ -60,6 +64,17 @@ FUNCPTR getCallback()
 {
   return gcb;
 }
+
+void setCgiCallback(FUNCCGIPTR cb)
+{
+  gcgicb = cb;
+}
+
+FUNCCGIPTR getCgiCallback()
+{
+  return gcgicb;
+}
+
 /*
    static mrb_value runTrusterd(mrb_state *mrb, mrb_value obj)
    {
@@ -320,12 +335,26 @@ mrb_value exec(mrb_state* mrb, mrb_value self)
 {
   char *script;
 
-  printf("class:Call, method:py_exec\n");
+  printf("class:Call, method:exec\n");
   // 第一引数を引数にコールバック関数を実行する。
   mrb_get_args(mrb, "z", &script);
 
-  (*getCallback())(script);
-  return self;
+  return  mrb_fixnum_value((*getCallback())(script));
+}
+
+mrb_value cgi_proc(mrb_state* mrb, mrb_value self)
+{
+  char *script;
+  mrb_value val;
+  char *str;
+
+  //printf("cgi call: start\n");
+  // 第一引数を引数にコールバック関数を実行する。
+  mrb_get_args(mrb, "z", &script);
+  str = (*getCgiCallback())(script);
+  val = mrb_str_new_cstr(mrb, str);
+  /*free(str);*/
+  return  val;
 }
 
 void mrbAddMyCallBack(mrb_state* mrb, FUNCPTR cb)
@@ -343,6 +372,19 @@ void mrbAddMyCallBack(mrb_state* mrb, FUNCPTR cb)
         #endif
 }
 
+void mrbAddCgiCallBack(mrb_state* mrb, FUNCCGIPTR cb)
+{
+  setCgiCallback(cb);
+
+  struct RClass *module, *cls;
+
+  module = mrb_module_get(mrb, "Libtrusterd");
+
+  // クラスを定義する
+  cls = mrb_define_class_under(mrb, module, "Cgi", mrb->object_class);
+  // クラスメソッドを定義する
+  mrb_define_class_method(mrb, cls, "cgi_proc", cgi_proc, MRB_ARGS_REQ(1));
+}
 int watchTrusterdConfFile(mrb_state *mrb, char *filepath)
 {
         #ifdef __APPLE__
@@ -353,6 +395,25 @@ int watchTrusterdConfFile(mrb_state *mrb, char *filepath)
 
 #endif
   return -1;
+}
+
+int boot_from_file_path_cgi(char *filepath, FUNCCGIPTR cb)
+{
+  int rtn;
+
+  assert(filepath != NULL);
+
+  mrb_state* mrb = mrb_open();
+  mrb_load_irep(mrb, commonUtil);
+
+  mrbAddCgiCallBack(mrb, cb);
+
+  rtn = watchTrusterdConfFile(mrb, filepath);
+  //mrb_load_string(mrb, name);
+
+  mrb_close(mrb);
+  //printf("we now return[%d]\n",rtn);
+  return rtn;
 }
 
 int boot_from_file_path(char *filepath, FUNCPTR cb)
@@ -376,6 +437,10 @@ int boot_from_file_path(char *filepath, FUNCPTR cb)
 
 int boot(char *name, FUNCPTR cb)
 {
+  mrb_value val;
+  struct RString *str;
+  char *err_out;
+
   assert(name != NULL);
   mrb_state* mrb = mrb_open();
 
@@ -384,6 +449,14 @@ int boot(char *name, FUNCPTR cb)
   mrbAddMyCallBack(mrb, cb);
 
   mrb_load_string(mrb, name);
+  if(mrb->exc) {
+      val = mrb_obj_value(mrb->exc);
+      if (mrb_type(val) == MRB_TT_STRING) {
+        str = mrb_str_ptr(val);
+        err_out = str->as.heap.ptr;
+        printf("%s\n",err_out);
+      }
+  }
   mrb_close(mrb);
   return printf("%s", name);
 }

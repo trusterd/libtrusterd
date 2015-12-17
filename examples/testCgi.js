@@ -1,4 +1,5 @@
 var fs = require('fs');
+var ref = require('ref');
 var ffi = require('ffi');
 
 var funcPtr = ffi.Function('int', ['string']);
@@ -8,6 +9,8 @@ var mylib = ffi.Library('./libtrusterd', {
   'boot_from_file_path_cgi': ['int', ['string', funcCgiPtr]]
 });
 
+var counter=0;
+
 // onReult will call by trusterd.
 var onResult = function(resultVal) {
   console.log('Result is', resultVal);
@@ -15,9 +18,14 @@ var onResult = function(resultVal) {
 }
 
 var onRequest = function(resultVal) {
-  console.log('Result is', resultVal);
-  return "<html>Hello, trusted,this is node.js.</html>";
+  //console.log('Result is', resultVal);
+  if(counter>501000) {
+
+    console.log(process.memoryUsage());
+  }
+  counter++;
+  return "<html>Hello, trusted,this is node.js.["+resultVal+"]</html>";
 }
 // start http2 trusterd.
-mylib.boot_from_file_path("examples/test.conf.rb",onResult);
+mylib.boot_from_file_path_cgi("examples/test.conf.rb",onRequest);
 //
